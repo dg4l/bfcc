@@ -45,7 +45,7 @@ int main(int argc, char** argv){
                 fprintf(stdout,"    fprintf(stdout, \"%%c\", *dp);\n");
                 break;
             case BF_GETC:
-                fprintf(stdout, "    *dp = getchar()\n;");
+                fprintf(stdout, "    *dp = getchar();\n");
                 break;
             case BF_LOOP_OPEN:
                 fprintf(stdout, "    while(*dp){\n");
