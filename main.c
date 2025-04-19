@@ -15,6 +15,7 @@ enum TOKS{
 };
 
 int main(int argc, char** argv){
+    size_t nested_level = 0;
     if (argc < 2){
         printf("error: no file input\n");
         return -1;
@@ -22,36 +23,44 @@ int main(int argc, char** argv){
     ByteArray* file = file_to_byte_array(argv[1]);
     fprintf(stdout, "#include <stdio.h>\n#include <stdint.h>\n#include <stdlib.h>\n\n");
     fprintf(stdout, "int main(void){\n");
-    fprintf(stdout, "    uint8_t* dp = malloc(50000);\n");
+    fprintf(stdout, "    uint8_t* d = malloc(50000);\n    uint8_t* dp = d;\n");
     for (size_t i = 0; i < file->bufsize; ++i){
+        for (size_t j = 0; j < nested_level; ++j){
+            fprintf(stdout, "    ");
+        }
         switch(file->buf[i]){
             case BF_DP_INC:
-                fprintf(stdout, "    ++dp;");
+                fprintf(stdout, "    ++dp;\n");
                 break;
             case BF_DP_DEC:
-                fprintf(stdout, "    --dp;");
+                fprintf(stdout, "    --dp;\n");
                 break;
             case BF_INC:
-                fprintf(stdout, "    ++(*dp);");
+                fprintf(stdout, "    ++(*dp);\n");
                 break;
             case BF_DEC:
-                fprintf(stdout, "    --(*dp);");
+                fprintf(stdout, "    --(*dp);\n");
                 break;
             case BF_PUTC:
-                fprintf(stdout,"    fprintf(stdout, \"%%c\", *dp);");
+                fprintf(stdout,"    fprintf(stdout, \"%%c\", *dp);\n");
                 break;
             case BF_GETC:
-                fprintf(stdout, "    *dp = getchar();");
+                fprintf(stdout, "    *dp = getchar()\n;");
                 break;
             case BF_LOOP_OPEN:
-                fprintf(stdout, "    while(*dp){");
+                fprintf(stdout, "    while(*dp){\n");
+                ++nested_level;
                 break;
             case BF_LOOP_CLOSING:
-                fprintf(stdout, "    }");
+                --nested_level;
+                fprintf(stdout, "}\n");
+                break;
+            default:
                 break;
         }
     }
     printf("\n");
+    printf("    free(d);\n");
     fprintf(stdout, "}\n");
     cleanup_bytearray(&file);
 }
