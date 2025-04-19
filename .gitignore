@@ -1,0 +1,4 @@
+hw
+bfcc
+*.c
+!main.c
